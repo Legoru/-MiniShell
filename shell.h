@@ -10,8 +10,8 @@
 #define BASE_COLOR "\033[0m"
 
 #define nivel1 0
-#define nivel2 1
-#define nivel3 0
+#define nivel2 0
+#define nivel3 1
 
 #include <stdlib.h>    /* Funciones malloc(), free(), y valor NULL */
 #include <stdio.h>     /* para printf en depurarión */
@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <errno.h>
 
 struct info_job {
     pid_t pid;

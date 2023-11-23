@@ -121,8 +121,8 @@ int internal_export(char **args)
         fprintf(stderr, "internal_export() -> valor erroneo\n");
         return EXIT_FAILURE;
     }
-    char *last_value = getenv(key);
     #if nivel2
+        char *last_value = getenv(key);
         printf("internal_export() -> nombre: %s\n", key);
         printf("internal_export() -> antiguo valor: %s\n", last_value);
         printf("internal_export() -> nuevo valor: %s\n", new_value);
