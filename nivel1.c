@@ -194,8 +194,16 @@ int main()
         imprimir_prompt();
         if (fgets(line, COMMAND_LINE_SIZE, stdin) == NULL)
         {
-            printf("\n%sNO FUIMOOO%s", ORANGE, BASE_COLOR);
-            exit(0);
+            if (feof(stdin))
+            {
+                printf("\r\nNos fuimos, hasta la proxima\n");
+                exit(0);
+            }
+            else
+            {
+                perror("Error al leer la línea");
+                exit(EXIT_FAILURE);
+            }
         }
         if (line != NULL)
         {

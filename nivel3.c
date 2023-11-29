@@ -28,12 +28,14 @@ int parse_args(char **args, char *line)
     {
         if (token[0] != '#')
         {
-        #if nivel1
+#if nivel1
             printf("%s - %d\n", token, num_tokens);
-        #endif
+#endif
             args[num_tokens] = token;
             num_tokens++;
-        } else {
+        }
+        else
+        {
             break;
         }
         token = strtok(NULL, del);
@@ -98,7 +100,7 @@ int internal_source(char **args)
         fprintf(stderr, "internal_source() -> numero argumentos incorrecto\n");
         return EXIT_FAILURE;
     }
-    FILE *fp = fopen(args[1],"r");
+    FILE *fp = fopen(args[1], "r");
     if (fp == NULL)
     {
         perror("No se pudo abrir el fichero");
@@ -108,18 +110,22 @@ int internal_source(char **args)
     while (fgets(line, COMMAND_LINE_SIZE, fp) != NULL)
     {
         printf("%s\n", line);
-        if(line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r') {
+        if (line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r')
+        {
             line[strlen(line) - 1] = '\0';
-        } else {
+        }
+        else
+        {
             strcat(line, "\0");
         }
         fflush(fp);
-        #if nivel3
-            printf("internal_source() -> LINE: %s\n", line);
-        #endif
+#if nivel3
+        printf("internal_source() -> LINE: %s\n", line);
+#endif
         execute_line(line);
     }
-    if (fclose(fp) == EXIT_FAILURE) {
+    if (fclose(fp) == EXIT_FAILURE)
+    {
         perror("No se pudo cerrar el fichero");
         return EXIT_FAILURE;
     }
@@ -287,8 +293,16 @@ int main(int argc, char **argv)
         imprimir_prompt();
         if (fgets(line, COMMAND_LINE_SIZE, stdin) == NULL)
         {
-            printf("\n%sNO FUIMOOO%s", ORANGE, BASE_COLOR);
-            exit(0);
+            if (feof(stdin))
+            {
+                printf("\r\nNos fuimos, hasta la proxima\n");
+                exit(0);
+            }
+            else
+            {
+                perror("Error al leer la línea");
+                exit(EXIT_FAILURE);
+            }
         }
         if (line != NULL)
         {
