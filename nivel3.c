@@ -28,11 +28,13 @@ int parse_args(char **args, char *line)
     {
         if (token[0] != '#')
         {
-#if nivel1
+        #if nivel1
             printf("%s - %d\n", token, num_tokens);
-#endif
+        #endif
             args[num_tokens] = token;
             num_tokens++;
+        } else {
+            break;
         }
         token = strtok(NULL, del);
     }
@@ -91,7 +93,36 @@ int internal_fg(char **args)
 
 int internal_source(char **args)
 {
-    printf("LLAMASTE A SOURCE\n");
+    if (args[1] == NULL)
+    {
+        fprintf(stderr, "internal_source() -> numero argumentos incorrecto\n");
+        return EXIT_FAILURE;
+    }
+    FILE *fp = fopen(args[1],"r");
+    if (fp == NULL)
+    {
+        perror("No se pudo abrir el fichero");
+        return EXIT_FAILURE;
+    }
+    char line[COMMAND_LINE_SIZE];
+    while (fgets(line, COMMAND_LINE_SIZE, fp) != NULL)
+    {
+        printf("%s\n", line);
+        if(line[strlen(line) - 1] == '\n' || line[strlen(line) - 1] == '\r') {
+            line[strlen(line) - 1] = '\0';
+        } else {
+            strcat(line, "\0");
+        }
+        fflush(fp);
+        #if nivel3
+            printf("internal_source() -> LINE: %s\n", line);
+        #endif
+        execute_line(line);
+    }
+    if (fclose(fp) == EXIT_FAILURE) {
+        perror("No se pudo cerrar el fichero");
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
@@ -219,18 +250,18 @@ int execute_line(char *line)
 
         if (WIFEXITED(status))
         {
-            #if nivel3
-                printf("execute_line() --> Proceso hijo %d (%s) finalizado con exit(), status: %d\n",child_pid, args[0], status);
-            #endif
+#if nivel3
+            printf("execute_line() --> Proceso hijo %d (%s) finalizado con exit(), status: %d\n", child_pid, args[0], status);
+#endif
         }
         else if (WIFSTOPPED(status))
         {
-            #if nivel3
-                printf("execute_line() --> Proceso hijo %d (%s) fue bloqueado, status: %d\n",child_pid, args[0], status);
-            #endif
+#if nivel3
+            printf("execute_line() --> Proceso hijo %d (%s) fue bloqueado, status: %d\n", child_pid, args[0], status);
+#endif
         }
 
-        //Reseteamos jobs_list[0]
+        // Reseteamos jobs_list[0]
         jobs_list[0].pid = 0;
         jobs_list[0].estado = 'N';
         memset(jobs_list[0].cmd, '\0', sizeof(jobs_list[0].cmd));

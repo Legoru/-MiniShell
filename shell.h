@@ -10,8 +10,23 @@
 #define BASE_COLOR "\033[0m"
 
 #define nivel1 0
+char* read_line(char *line);
+int execute_line(char *line);
+int parse_args(char **args, char *line);
+int check_internal(char **args);
+int internal_cd(char **args);
+int internal_export(char **args);
+int internal_source(char **args);
+int internal_jobs();
+int internal_fg(char **args);
+int internal_bg(char **args);
+
 #define nivel2 0
+int internal_cd(char **args);
+int internal_export(char **args);
+
 #define nivel3 1
+
 
 #include <stdlib.h>    /* Funciones malloc(), free(), y valor NULL */
 #include <stdio.h>     /* para printf en depurarión */
