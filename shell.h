@@ -4,6 +4,8 @@
 #include <string.h>    /* para funciones de strings  */
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h> 
+#include <fcntl.h> 
 #include <unistd.h>
 #include <errno.h>
 #include <signal.h>
@@ -35,17 +37,22 @@ int internal_bg(char **args);
 int internal_cd(char **args);
 int internal_export(char **args);
 
-#define nivel3 1
+#define nivel3 0
 
-#define nivel4 1
+#define nivel4 0
 void reaper(int signum);
 void ctrlc(int signum);
 
-#define nivel5 1
+#define nivel5 0
 int is_background(char** args);
 int jobs_list_add(pid_t pid, char estado, char* cmd);
 int jobs_list_remove(int pos);
 int jobs_list_find(pid_t pid);
+
+#define nivel6 1
+int internal_fg(char** args);
+int internal_bg(char** args);
+int is_output_redirection(char** args);
 
 struct info_job {
     pid_t pid;
