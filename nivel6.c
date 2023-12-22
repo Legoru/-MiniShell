@@ -488,7 +488,7 @@ void ctrlz()
 int execute_line(char *line)
 {
     char sup_line[COMMAND_LINE_SIZE];
-    memset(sup_line, '\0', sizeof(line));
+    memset(sup_line, '\0', sizeof(sup_line));
     strcpy(sup_line, line);
     char *args[MAX_ARGS];
     if (parse_args(args, line) == EXIT_FAILURE)
@@ -611,6 +611,7 @@ int jobs_list_remove(int pos)
 
 int is_output_redirection(char **args)
 {
+    return EXIT_SUCCESS;
 }
 
 /**

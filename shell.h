@@ -21,7 +21,7 @@
 #define ORANGE "\033[1;34m"
 #define BASE_COLOR "\033[0m"
 
-#define nivel1 0
+#define nivel1 1
 char* read_line(char *line);
 int execute_line(char *line);
 int parse_args(char **args, char *line);
@@ -33,17 +33,17 @@ int internal_jobs();
 int internal_fg(char **args);
 int internal_bg(char **args);
 
-#define DEBUGN2 0
+#define DEBUGN2 1
 int internal_cd(char **args);
 int internal_export(char **args);
 
-#define DEBUGN3 0
+#define DEBUGN3 1
 
-#define DEBUGN4 0
+#define DEBUGN4 1
 void reaper(int signum);
 void ctrlc(int signum);
 
-#define DEBUGN5 0
+#define DEBUGN5 1
 int is_background(char** args);
 int jobs_list_add(pid_t pid, char estado, char* cmd);
 int jobs_list_remove(int pos);

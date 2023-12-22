@@ -253,7 +253,6 @@ int execute_line(char *line)
         strcpy(jobs_list[0].cmd, sup_line);
 
         int child_pid = wait(&status);
-
         if (WIFEXITED(status))
         {
 #if DEBUGN3

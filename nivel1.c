@@ -117,7 +117,6 @@ int main()
     while (1)
     {
         char *line = malloc(COMMAND_LINE_SIZE);
-        imprimir_prompt();
         if (fgets(line, COMMAND_LINE_SIZE, stdin) == NULL)
         {
             if (feof(stdin))
