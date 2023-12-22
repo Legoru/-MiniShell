@@ -409,6 +409,7 @@ void ctrlc(int signum)
             getpid(), mi_shell, jobs_list[0].pid, jobs_list[0].cmd);
     write(2, mensaje, strlen(mensaje));
 #endif
+    printf("\n");
     if (jobs_list[0].pid > 0)
     {
         if (jobs_list[0].cmd != mi_shell)
@@ -445,6 +446,7 @@ void ctrlc(int signum)
 void ctrlz()
 {
     signal(SIGTSTP, ctrlz);
+    printf("\n");
     if (jobs_list[0].pid > 0)
     {
         if (strcmp(jobs_list[0].cmd, mi_shell))
