@@ -33,23 +33,23 @@ int internal_jobs();
 int internal_fg(char **args);
 int internal_bg(char **args);
 
-#define nivel2 0
+#define DEBUGN2 0
 int internal_cd(char **args);
 int internal_export(char **args);
 
-#define nivel3 0
+#define DEBUGN3 0
 
-#define nivel4 0
+#define DEBUGN4 0
 void reaper(int signum);
 void ctrlc(int signum);
 
-#define nivel5 0
+#define DEBUGN5 0
 int is_background(char** args);
 int jobs_list_add(pid_t pid, char estado, char* cmd);
 int jobs_list_remove(int pos);
 int jobs_list_find(pid_t pid);
 
-#define nivel6 1
+#define DEBUGN6 1
 int internal_fg(char** args);
 int internal_bg(char** args);
 int is_output_redirection(char** args);

@@ -1,5 +1,20 @@
 #include "shell.h"
 
+void imprimir_prompt()
+{
+    char *USER = getenv("USER");
+    // char *HOME = getenv("HOME");
+    char CWD[_MAX_PATH];
+
+    if (!(getcwd(CWD, sizeof(CWD)) != NULL))
+    {
+        perror("getcwd() error");
+    }
+    // TODO: LIMPIAR HOME
+
+    printf("%s%s:~%s%s%c%s", ORANGE, USER, CREAM, CWD, PROMPT, BASE_COLOR);
+}
+
 // cuando devuelve error?
 int parse_args(char **args, char *line)
 {
@@ -27,7 +42,35 @@ int parse_args(char **args, char *line)
 
 int internal_cd(char **args)
 {
-    printf("LLAMASTE A CD\n");
+    if (args[1] == NULL)
+    {
+        if (chdir(getenv("HOME")) != 0)
+        {
+            perror("internal_cd home error");
+        }
+    }
+    else if (args[2] == NULL)
+    {
+        if (chdir(args[1]) != 0)
+        {
+            perror("internal_cd error");
+        }
+    }
+    else
+    {
+        // TODO: implementar cd avanzado
+        if (strchr(args[1], '\'') || strchr(args[1], '"'))
+        {
+        }
+    }
+    #if DEBUGN2
+        char CWD[_MAX_PATH];
+        if (!(getcwd(CWD, sizeof(CWD)) != NULL))
+        {
+            perror("getcwd() error");
+        }
+        printf("internal_cd() --> %s\n", CWD);
+    #endif
     return EXIT_SUCCESS;
 }
 
@@ -57,7 +100,38 @@ int internal_jobs(char **args)
 
 int internal_export(char **args)
 {
-    printf("LLAMASTE A EXPORT\n");
+    if (args[2] != NULL)
+    {
+        fprintf(stderr, "internal_export() -> numero argumentos incorrecto\n");
+        return EXIT_FAILURE;
+    }
+    char *key;
+    char *new_value;
+    char *del = "=";
+    char *token = strtok(args[1], del);
+    if (token == NULL)
+    {
+        fprintf(stderr, "internal_export() -> no hay clave\n");
+        return EXIT_FAILURE;
+    }
+    key = token;
+    new_value = strtok(NULL, "");
+    if (new_value == NULL)
+    {
+        fprintf(stderr, "internal_export() -> valor erroneo\n");
+        return EXIT_FAILURE;
+    }
+    #if DEBUGN2
+        char *last_value = getenv(key);
+        printf("internal_export() -> nombre: %s\n", key);
+        printf("internal_export() -> antiguo valor: %s\n", last_value);
+        printf("internal_export() -> nuevo valor: %s\n", new_value);
+    #endif
+    if (setenv(key, new_value, 1) != 0)
+    {
+        perror("internal_export() -> setenv");
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 

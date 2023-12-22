@@ -70,7 +70,7 @@ int internal_cd(char **args)
         {
         }
     }
-#if nivel2
+#if DEBUGN2
     char CWD[_MAX_PATH];
     if (!(getcwd(CWD, sizeof(CWD)) != NULL))
     {
@@ -119,7 +119,7 @@ int internal_source(char **args)
             strcat(line, "\0");
         }
         fflush(fp);
-#if nivel3
+#if DEBUGN3
         printf("internal_source() -> LINE: %s\n", line);
 #endif
         execute_line(line);
@@ -161,7 +161,7 @@ int internal_export(char **args)
         fprintf(stderr, "internal_export() -> valor erroneo\n");
         return EXIT_FAILURE;
     }
-#if nivel2
+#if DEBUGN2
     char *last_value = getenv(key);
     printf("internal_export() -> nombre: %s\n", key);
     printf("internal_export() -> antiguo valor: %s\n", last_value);
@@ -224,7 +224,7 @@ void reaper(int signum)
     {
         if (ended == jobs_list[0].pid)
         {
-#if nivel4
+#if DEBUGN4
             char mensaje[1200];
             sprintf(mensaje, "[reaper()→ Proceso hijo %d (%s) finalizado con exit code %d]\n", ended, jobs_list[0].cmd, WEXITSTATUS(status));
             write(2, mensaje, strlen(mensaje));
@@ -240,7 +240,7 @@ void reaper(int signum)
 
 void ctrlc(int signum)
 {
-#if nivel4
+#if DEBUGN4
     char mensaje[1200];
     sprintf(mensaje, "\nctrlc()→ Soy el proceso con PID %d el proceso en foreground es %d\n", getpid(), jobs_list[0].pid);
     write(2, mensaje, strlen(mensaje));
@@ -249,7 +249,7 @@ void ctrlc(int signum)
     {
         if (jobs_list[0].cmd != mi_shell)
         {
-#if nivel4
+#if DEBUGN4
             char mensaje[1200];
             sprintf(mensaje, "ctrlc()→ Señal SIGTERM enviada por %d a %d\n", getpid(), jobs_list[0].pid);
             write(2, mensaje, strlen(mensaje));
@@ -258,7 +258,7 @@ void ctrlc(int signum)
         }
         else
         {
-#if nivel4
+#if DEBUGN4
             char mensaje[1200];
             sprintf(mensaje, "ctrlc()→ Señal %d no enviada por %d debido a que no hay proceso en foreground", SIGTERM, getpid());
             write(2, mensaje, strlen(mensaje));
@@ -296,7 +296,7 @@ int execute_line(char *line)
     int pid = fork();
     if (pid == 0)
     { // es el hijo
-#if nivel3
+#if DEBUGN3
         printf("execute_line() --> PID hijo: %d (%s)\n", getpid(), sup_line);
 #endif
         // manejamos señales
@@ -308,7 +308,7 @@ int execute_line(char *line)
     }
     else
     { // es el padre con el pid del hijo
-#if nivel3
+#if DEBUGN3
         printf("execute_line() --> PID padre: %d (%s)\n", getpid(), mi_shell);
 #endif
         jobs_list[0].pid = pid;

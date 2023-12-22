@@ -70,7 +70,7 @@ int internal_cd(char **args)
         {
         }
     }
-#if nivel2
+#if DEBUGN2
     char CWD[_MAX_PATH];
     if (!(getcwd(CWD, sizeof(CWD)) != NULL))
     {
@@ -119,7 +119,7 @@ int internal_source(char **args)
             strcat(line, "\0");
         }
         fflush(fp);
-#if nivel3
+#if DEBUGN3
         printf("internal_source() -> LINE: %s\n", line);
 #endif
         execute_line(line);
@@ -161,7 +161,7 @@ int internal_export(char **args)
         fprintf(stderr, "internal_export() -> valor erroneo\n");
         return EXIT_FAILURE;
     }
-#if nivel2
+#if DEBUGN2
     char *last_value = getenv(key);
     printf("internal_export() -> nombre: %s\n", key);
     printf("internal_export() -> antiguo valor: %s\n", last_value);
@@ -235,7 +235,7 @@ int execute_line(char *line)
     int pid = fork();
     if (pid == 0)
     { // es el hijo
-#if nivel3
+#if DEBUGN3
         printf("execute_line() --> PID hijo: %d (%s)\n", getpid(), args[0]);
 #endif
         execvp(args[0], args);
@@ -244,7 +244,7 @@ int execute_line(char *line)
     }
     else
     { // es el padre con el pid del hijo
-#if nivel3
+#if DEBUGN3
         printf("execute_line() --> PID padre: %d (%s)\n", getpid(), mi_shell);
 #endif
         int status;
@@ -256,13 +256,13 @@ int execute_line(char *line)
 
         if (WIFEXITED(status))
         {
-#if nivel3
+#if DEBUGN3
             printf("execute_line() --> Proceso hijo %d (%s) finalizado con exit(), status: %d\n", child_pid, args[0], status);
 #endif
         }
         else if (WIFSTOPPED(status))
         {
-#if nivel3
+#if DEBUGN3
             printf("execute_line() --> Proceso hijo %d (%s) fue bloqueado, status: %d\n", child_pid, args[0], status);
 #endif
         }
