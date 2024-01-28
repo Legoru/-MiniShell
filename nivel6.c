@@ -412,7 +412,7 @@ void ctrlc(int signum)
     printf("\n");
     if (jobs_list[0].pid > 0)
     {
-        if (jobs_list[0].cmd != mi_shell)
+        if (strncmp(jobs_list[0].cmd, mi_shell, strlen(mi_shell)) != 0)
         {
 #if DEBUGN4
             sprintf(mensaje, "ctrlc()→ Señal SIGTERM enviada por %d a %d\n", getpid(), jobs_list[0].pid);
@@ -635,7 +635,7 @@ int main(int argc, char **argv)
     signal(SIGINT, ctrlc);
     signal(SIGTSTP, ctrlz);
     // Copiamos valor dado por consola a mi_shell actualizamos job_list[0]
-    strcpy(mi_shell, argv[1]);
+    strcpy(mi_shell, argv[0]);
     jobs_list[0].pid = 0;
     jobs_list[0].estado = 'N';
     memset(jobs_list[0].cmd, '\0', sizeof(jobs_list[0].cmd));
