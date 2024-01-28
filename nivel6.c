@@ -625,11 +625,6 @@ int is_output_redirection(char **args)
  */
 int main(int argc, char **argv)
 {
-    if (argc != 2)
-    {
-        fprintf(stderr, "FORMATO INCORRECTO --> ./nivelN nombre_shell\n");
-        return EXIT_FAILURE;
-    }
     // Anclamos manejadores a señales
     signal(SIGCHLD, reaper);
     signal(SIGINT, ctrlc);
