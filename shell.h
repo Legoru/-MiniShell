@@ -51,7 +51,7 @@ int jobs_list_add(pid_t pid, char estado, char* cmd);
 int jobs_list_remove(int pos);
 int jobs_list_find(pid_t pid);
 
-#define DEBUGN6 0
+#define DEBUGN6 1
 int internal_fg(char** args);
 int internal_bg(char** args);
 int is_output_redirection(char** args);

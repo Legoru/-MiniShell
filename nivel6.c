@@ -295,7 +295,7 @@ int internal_bg(char **args)
 
     kill(jobs_list[pos].pid, SIGCONT);
 #if DEBUGN6
-    fprintf(stderr, "internal_bg() -> Enviando señal SIGCONT a %d (%s)", jobs_list[pos].pid, jobs_list[pos].cmd);
+    fprintf(stderr, "internal_bg() -> Enviando señal SIGCONT a %d (%s)\n", jobs_list[pos].pid, jobs_list[pos].cmd);
 #endif
 
     return EXIT_SUCCESS;
@@ -378,11 +378,6 @@ void reaper(int signum)
         }
         if (ended == jobs_list[0].pid)
         {
-#if DEBUGN4
-            sprintf(mensaje, "[reaper()→ Proceso hijo %d (%s) finalizado con exit code %d]\n", ended, jobs_list[0].cmd, WEXITSTATUS(status));
-            write(2, mensaje, strlen(mensaje));
-#endif
-            // Reseteamos jobs_list[0]
             jobs_list[0].pid = 0;
             jobs_list[0].estado = 'N';
             memset(jobs_list[0].cmd, '\0', sizeof(jobs_list[0].cmd));
@@ -390,7 +385,10 @@ void reaper(int signum)
         else
         {
             int pos = jobs_list_find(ended);
-            sprintf(mensaje, "reaper() -> Proceso %d (%s) finalizado\n", ended, jobs_list[pos].cmd);
+            #if DEBUGN4
+                sprintf(mensaje, "reaper() -> Proceso hijo %d en background (%s) finalizado con exit code %d\n", ended, jobs_list[pos].cmd, WEXITSTATUS(status));
+                write(2, mensaje, strlen(mensaje));
+            #endif
             jobs_list_remove(pos);
         }
     }
