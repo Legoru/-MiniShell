@@ -7,7 +7,7 @@ static char mensaje[2200];
 
 /**
  * @brief imprime el prompt por pantalla inicial
- * 
+ *
  */
 void imprimir_prompt()
 {
@@ -24,7 +24,7 @@ void imprimir_prompt()
 
 /**
  * @brief devuelve si un cmd de un job esta o no en background
- * 
+ *
  * @param args el cmd
  * @return int estado de la funcion
  */
@@ -58,9 +58,6 @@ int parse_args(char **args, char *line)
     {
         if (token[0] != '#')
         {
-#if nivel1
-            printf("%s - %d\n", token, num_tokens);
-#endif
             args[num_tokens] = token;
             num_tokens++;
         }
@@ -71,18 +68,15 @@ int parse_args(char **args, char *line)
         token = strtok(NULL, del);
     }
     args[num_tokens] = NULL;
-#if nivel1
-    printf("Total tokens: %d\n", num_tokens);
-#endif
     return EXIT_SUCCESS;
 }
 
 /**
- * @brief Comando interno que viene a sustituir cd, redirecciona 
+ * @brief Comando interno que viene a sustituir cd, redirecciona
  * el directorio al especificado por consola
- * 
- * @param args cd "directorio" 
- * @return int estado 
+ *
+ * @param args cd "directorio"
+ * @return int estado
  */
 int internal_cd(char **args)
 {
@@ -100,20 +94,12 @@ int internal_cd(char **args)
             perror("internal_cd error");
         }
     }
-#if DEBUGN2
-    char CWD[_MAX_PATH];
-    if (!(getcwd(CWD, sizeof(CWD)) != NULL))
-    {
-        perror("getcwd() error");
-    }
-    printf("internal_cd() --> %s\n", CWD);
-#endif
     return EXIT_SUCCESS;
 }
 
 /**
  * @brief implementacion del comando source
- * 
+ *
  * @param args source nombre_archivo
  * @return int estado de la funcion
  */
@@ -143,9 +129,6 @@ int internal_source(char **args)
             strcat(line, "\0");
         }
         fflush(fp);
-#if DEBUGN3
-        printf("internal_source() -> LINE: %s\n", line);
-#endif
         execute_line(line);
     }
     if (fclose(fp) == EXIT_FAILURE)
@@ -159,7 +142,7 @@ int internal_source(char **args)
 /**
  * @brief imprime todos los jobs que hay actualmente en un
  * formato parecido al de linux
- * 
+ *
  * @param args jobs
  * @return int estado de la funcion, no puede dar error
  */
@@ -180,7 +163,7 @@ int internal_jobs(char **args)
 
 /**
  * @brief comando export implementado en nuestro shell
- * 
+ *
  * @param args export CLAVE=VALOR
  * @return int estado de la funcion
  */
@@ -207,12 +190,6 @@ int internal_export(char **args)
         fprintf(stderr, "internal_export() -> valor erroneo\n");
         return EXIT_FAILURE;
     }
-#if DEBUGN2
-    char *last_value = getenv(key);
-    printf("internal_export() -> nombre: %s\n", key);
-    printf("internal_export() -> antiguo valor: %s\n", last_value);
-    printf("internal_export() -> nuevo valor: %s\n", new_value);
-#endif
     if (setenv(key, new_value, 1) != 0)
     {
         perror("internal_export() -> setenv");
@@ -223,7 +200,7 @@ int internal_export(char **args)
 
 /**
  * @brief funcion fg adaptada a nuestro shell
- * 
+ *
  * @param args fg numero_job
  * @return int estado de la funcion
  */
@@ -267,7 +244,7 @@ int internal_fg(char **args)
 
 /**
  * @brief implementacion interna del comando bg
- * 
+ *
  * @param args bg numero_job
  * @return int estado de la funcion
  */
@@ -292,12 +269,10 @@ int internal_bg(char **args)
     }
     jobs_list[pos].estado = 'E';
     strcat(jobs_list[pos].cmd, " &\0");
+    printf("[%d] %d \t %c \t %s\n",
+           pos, jobs_list[pos].pid, jobs_list[pos].estado, jobs_list[pos].cmd);
 
     kill(jobs_list[pos].pid, SIGCONT);
-#if DEBUGN6
-    fprintf(stderr, "internal_bg() -> Enviando señal SIGCONT a %d (%s)", jobs_list[pos].pid, jobs_list[pos].cmd);
-#endif
-
     return EXIT_SUCCESS;
 }
 
@@ -305,7 +280,7 @@ int internal_bg(char **args)
  * @brief mira si el comando introducido por el shell
  * es un comando creado por nosotros, si lo es ejecuta
  * su respectiva funcion internal, sino se ejecuta normal
- * 
+ *
  * @param args el nombre del comando args[0]
  * @return int estado de la funcion
  */
@@ -353,37 +328,17 @@ int check_internal(char **args)
 
 /**
  * @brief funcion asociada a SIGCHLD
- * 
- * @param signum 
+ *
+ * @param signum
  */
 void reaper(int signum)
 {
-    printf("\n");
     int ended;
     int status;
     while ((ended = waitpid(-1, &status, WNOHANG)) > 0)
     {
-        if (WIFEXITED(status))
-        {
-#if DEBUGN4
-            sprintf(mensaje, "[reaper()→ Proceso hijo %d (%s) finalizado con exit code %d]\n", ended, jobs_list[0].cmd, WEXITSTATUS(status));
-            write(2, mensaje, strlen(mensaje));
-#endif
-        }
-        if (WIFSIGNALED(status))
-        {
-#if DEBUGN4
-            sprintf(mensaje, "[reaper()→ Proceso hijo %d (%s) finalizado por señal %d]\n", ended, jobs_list[0].cmd, WTERMSIG(status));
-            write(2, mensaje, strlen(mensaje));
-#endif
-        }
         if (ended == jobs_list[0].pid)
         {
-#if DEBUGN4
-            sprintf(mensaje, "[reaper()→ Proceso hijo %d (%s) finalizado con exit code %d]\n", ended, jobs_list[0].cmd, WEXITSTATUS(status));
-            write(2, mensaje, strlen(mensaje));
-#endif
-            // Reseteamos jobs_list[0]
             jobs_list[0].pid = 0;
             jobs_list[0].estado = 'N';
             memset(jobs_list[0].cmd, '\0', sizeof(jobs_list[0].cmd));
@@ -391,7 +346,8 @@ void reaper(int signum)
         else
         {
             int pos = jobs_list_find(ended);
-            sprintf(mensaje, "reaper() -> Proceso %d (%s) finalizado\n", ended, jobs_list[pos].cmd);
+            sprintf(mensaje,"Terminado %d (%s) en jobs_list[%d] con status %d\n", ended, jobs_list[pos].cmd, pos, WEXITSTATUS(status));
+            write(2, mensaje, strlen(mensaje));
             jobs_list_remove(pos);
         }
     }
@@ -400,41 +356,17 @@ void reaper(int signum)
 
 /**
  * @brief funcion asociada a ctrlc que finaliza un job
- * 
- * @param signum 
+ *
+ * @param signum
  */
 void ctrlc(int signum)
 {
-#if DEBUGN4
-    sprintf(mensaje, "\nctrlc()→ Soy el proceso con PID %d (%s) el proceso en foreground es %d (%s)\n",
-            getpid(), mi_shell, jobs_list[0].pid, jobs_list[0].cmd);
-    write(2, mensaje, strlen(mensaje));
-#endif
-    printf("\n");
     if (jobs_list[0].pid > 0)
     {
-        if (jobs_list[0].cmd != mi_shell)
+        if (strncmp(jobs_list[0].cmd, mi_shell, strlen(mi_shell)) != 0)
         {
-#if DEBUGN4
-            sprintf(mensaje, "ctrlc()→ Señal SIGTERM enviada por %d a %d\n", getpid(), jobs_list[0].pid);
-            write(2, mensaje, strlen(mensaje));
-#endif
             kill(jobs_list[0].pid, SIGTERM);
         }
-        else
-        {
-#if DEBUGN4
-            sprintf(mensaje, "ctrlc()→ Señal %d no enviada por %d debido a que no hay proceso en foreground", SIGTERM, getpid());
-            write(2, mensaje, strlen(mensaje));
-#endif
-        }
-    }
-    else
-    {
-#if DEBUGN4
-        fprintf(stderr, "Señal SIGTERM no enviada por %d (%s) debido a que no hay proceso en foreground\n",
-                getpid(), mi_shell);
-#endif
     }
     signal(SIGINT, ctrlc);
 }
@@ -442,21 +374,16 @@ void ctrlc(int signum)
 /**
  * @brief funcion asociada a ctrlz que para un job poniendolo
  * en estado 'D'
- * 
+ *
  */
 void ctrlz()
 {
     signal(SIGTSTP, ctrlz);
-    printf("\n");
     if (jobs_list[0].pid > 0)
     {
         if (strcmp(jobs_list[0].cmd, mi_shell))
         {
             kill(jobs_list[0].pid, SIGSTOP);
-#if DEBUGN5
-            sprintf(mensaje, "ctrlz() -> Envida señal %d a %d (%s) por %d (%s)", SIGSTOP,
-                    jobs_list[0].pid, jobs_list[0].cmd, getpid(), mi_shell);
-#endif
             jobs_list[0].estado = 'D';
             jobs_list_add(jobs_list[0].pid, jobs_list[0].estado, jobs_list[0].cmd);
 
@@ -482,7 +409,7 @@ void ctrlz()
 /**
  * @brief funcion principal del programa, se dedica a ir ejecutando
  * y parseando cada una de las entradas del programa
- * 
+ *
  * @param line la linea introducida por el usuario
  * @return int estado de la funcion
  */
@@ -511,9 +438,6 @@ int execute_line(char *line)
     int pid = fork();
     if (pid == 0)
     { // es el hijo
-#if DEBUGN3
-        printf("execute_line() --> PID hijo: %d (%s)\n", getpid(), sup_line);
-#endif
         // manejamos señales
         signal(SIGCHLD, reaper);
         signal(SIGINT, SIG_IGN);
@@ -526,9 +450,6 @@ int execute_line(char *line)
     }
     else
     { // es el padre con el pid del hijo
-#if DEBUGN3
-        printf("execute_line() --> PID padre: %d (%s)\n", getpid(), mi_shell);
-#endif
         if (!bg)
         {
             jobs_list[0].pid = pid;
@@ -550,7 +471,7 @@ int execute_line(char *line)
 
 /**
  * @brief añade un trabajo a job_list
- * 
+ *
  * @param pid el pid
  * @param estado su estado actual
  * @param cmd su cmd
@@ -578,7 +499,7 @@ int jobs_list_add(pid_t pid, char estado, char *cmd)
 /**
  * @brief dado un pid devuelve la posicion de ese
  * job en nuestra lista job_list
- * 
+ *
  * @param pid el pid del job a buscar
  * @return int posicion del job
  */
@@ -595,7 +516,7 @@ int jobs_list_find(pid_t pid)
 /**
  * @brief dado una posicion de jobs_list elimina
  * ese trabajo del array
- * 
+ *
  * @param pos posicion a eliminar
  * @return int estado de la funcion
  */
@@ -619,24 +540,19 @@ int is_output_redirection(char **args)
  * @brief inicializacion del programa, asocia señales
  * a las funciones creadas y ejecuta un bucle infinito del que se sale
  * solo con el comando EXIT o ctrl+D
- * 
+ *
  * @param argc se esperan dos argumentos
  * @param argv ./shell nombre_shell
- * @return int 
+ * @return int
  */
 int main(int argc, char **argv)
 {
-    if (argc != 2)
-    {
-        fprintf(stderr, "FORMATO INCORRECTO --> ./nivelN nombre_shell\n");
-        return EXIT_FAILURE;
-    }
     // Anclamos manejadores a señales
     signal(SIGCHLD, reaper);
     signal(SIGINT, ctrlc);
     signal(SIGTSTP, ctrlz);
     // Copiamos valor dado por consola a mi_shell actualizamos job_list[0]
-    strcpy(mi_shell, argv[1]);
+    strcpy(mi_shell, argv[0]);
     jobs_list[0].pid = 0;
     jobs_list[0].estado = 'N';
     memset(jobs_list[0].cmd, '\0', sizeof(jobs_list[0].cmd));
